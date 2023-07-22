@@ -66,4 +66,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         return UserDetailsImpl.build(user);
     }
+
+    @Override
+    public void deleteUser(String userId) {
+        userRepository.deleteById(userId);
+    }
 }

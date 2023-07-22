@@ -75,10 +75,14 @@ public class UserController {
         return new ResponseEntity<List<User>>(usersList,HttpStatus.OK);
     }
 
-    @GetMapping("/searchUser/{userId}/{name}")
+    @GetMapping(value = {"/searchUser/{userId}/{name}", "/searchUser/{searchVal}"})
     private ResponseEntity<User> searchUser(@PathVariable Map<String, String> userSearch){
         String userId = userSearch.get("userId");
         String userName = userSearch.get("name");
+        if(userId==null && userName == null) {
+            userId = userSearch.get("searchVal");
+            userName = userSearch.get("searchVal");
+        }
         logger.info("Search User by name and id....");
         User searchUser = userService.searchUser(userId, userName);
         return new ResponseEntity<User>(searchUser,HttpStatus.OK);
@@ -88,5 +92,15 @@ public class UserController {
         logger.info("Fetch All Users....");
         List<User> usersList = userService.getAllUser();
         return new ResponseEntity<List<User>>(usersList,HttpStatus.OK);
+    }
+
+    @PostMapping("/deleteUser/{userId}")
+    private ResponseEntityObject deleteUser(@PathVariable String userId){
+        logger.info("Delete User....");
+        ResponseEntityObject responseEntityObject = new ResponseEntityObject();
+        userService.deleteUser(userId);
+        responseEntityObject.setResponseCode(200);
+        responseEntityObject.setResponseMessage("User deleted successfully");
+        return responseEntityObject;
     }
 }
