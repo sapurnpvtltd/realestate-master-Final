@@ -9,9 +9,9 @@ import java.util.List;
 public interface AgentService {
     public Agent createAgent(Agent agent);
     public Agent updateAgent(Agent agent);
-    public Agent searchAgent(String agentId, String agentName);
+    public Agent searchAgent(Integer agentId, String agentName);
     public List<Agent> getAllAgent();
     public boolean existsByAgentName(String agentName);
     public boolean existsByAgentEmailId(String agentEmailId);
-    public void deleteAgent(String userId);
+    public void deleteAgent(Integer agentId);
 }

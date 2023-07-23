@@ -62,10 +62,10 @@ public class ClientController {
 
     @GetMapping(value = {"/searchClient/{clientId}/{name}", "/searchClient/{searchVal}"})
     private ResponseEntity<Client> searchClient(@PathVariable Map<String, String> clientSearch){
-        String clientId = clientSearch.get("clientId");
+        Integer clientId = Integer.valueOf(clientSearch.get("clientId"));
         String clientName = clientSearch.get("name");
         if(clientId==null && clientName == null) {
-            clientId = clientSearch.get("searchVal");
+            clientId = Integer.valueOf(clientSearch.get("searchVal"));
             clientName = clientSearch.get("searchVal");
         }
         logger.info("Search Clinet by name and id....");
@@ -80,7 +80,7 @@ public class ClientController {
     }
 
     @PostMapping("/deleteClient/{clientId}")
-    private ResponseEntityObject deleteClient(@PathVariable String clientId){
+    private ResponseEntityObject deleteClient(@PathVariable Integer clientId){
         logger.info("Delete client....");
         ResponseEntityObject responseEntityObject = new ResponseEntityObject();
         clientService.deleteClient(clientId);

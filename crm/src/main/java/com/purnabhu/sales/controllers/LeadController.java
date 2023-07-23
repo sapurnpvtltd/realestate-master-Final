@@ -62,10 +62,10 @@ public class LeadController {
 
     @GetMapping(value = {"/searchLead/{leadId}/{name}", "/searchUser/{searchVal}"})
     private ResponseEntity<Lead> searchLead(@PathVariable Map<String, String> leadSearch){
-        String leadId = leadSearch.get("leadId");
+        Integer leadId = Integer.valueOf(leadSearch.get("leadId"));
         String clientName = leadSearch.get("name");
         if(leadId==null && clientName == null) {
-            leadId = leadSearch.get("searchVal");
+            leadId = Integer.valueOf(leadSearch.get("searchVal"));
             clientName = leadSearch.get("searchVal");
         }
         logger.info("Search Lead by name and id....");
@@ -79,7 +79,7 @@ public class LeadController {
         return new ResponseEntity<List<Lead>>(leadList,HttpStatus.OK);
     }
     @PostMapping("/deleteLead/{leadId}")
-    private ResponseEntityObject deleteUser(@PathVariable String leadId){
+    private ResponseEntityObject deleteUser(@PathVariable Integer leadId){
         logger.info("Delete Lead....");
         ResponseEntityObject responseEntityObject = new ResponseEntityObject();
         leadService.deleteLead(leadId);

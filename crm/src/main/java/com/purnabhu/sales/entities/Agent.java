@@ -1,8 +1,6 @@
 package com.purnabhu.sales.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +16,8 @@ import java.util.Date;
 @Table(name="agent")
 public class Agent {
     @Id
-    private String agentId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer agentId;
     private String agentName;
     private String agentMobileNo;
     private String agentEmailId;

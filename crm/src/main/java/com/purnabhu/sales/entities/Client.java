@@ -1,8 +1,6 @@
 package com.purnabhu.sales.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
@@ -15,7 +13,8 @@ import java.util.Date;
 @Table(name="client")
 public class Client {
     @Id
-    private String clientId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer clientId;
     private String clientName;
     private String clientMobileNo;
     private String clientEmailId;

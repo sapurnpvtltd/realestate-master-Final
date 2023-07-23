@@ -9,11 +9,11 @@ import java.util.List;
 public interface LeadService {
     public Lead createLead(Lead lead);
     public Lead updateLead(Lead lead);
-    public Lead searchLead(String leadId, String clientName);
+    public Lead searchLead(Integer leadId, String clientName);
     public List<Lead> getAllLead();
     public boolean existsByClientName(String clientName);
     public boolean existsByClientEmailId(String clientEmailId);
 
-    public void deleteLead(String leadId);
+    public void deleteLead(Integer leadId);
 
 }

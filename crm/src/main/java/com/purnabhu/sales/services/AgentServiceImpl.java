@@ -26,7 +26,7 @@ public class AgentServiceImpl implements AgentService{
     }
 
     @Override
-    public Agent searchAgent(String agentId, String agentName) {
+    public Agent searchAgent(Integer agentId, String agentName) {
         return agentRepository.findByAgentIdOrAgentName(agentId, agentName);
     }
 
@@ -47,7 +47,7 @@ public class AgentServiceImpl implements AgentService{
     }
 
     @Override
-    public void deleteAgent(String agentId) {
+    public void deleteAgent(Integer agentId) {
         agentRepository.deleteById(agentId);
     }
 

@@ -9,9 +9,9 @@ import java.util.List;
 public interface ClientService {
     public Client createClient(Client client);
     public Client updateClient(Client client);
-    public Client searchClient(String clientId, String clientName);
+    public Client searchClient(Integer clientId, String clientName);
     public List<Client> getAllClient();
     public boolean existsByClientName(String clientName);
     public boolean existsByClientEmailId(String clientEmailId);
-    public void deleteClient(String clientId);
+    public void deleteClient(Integer clientId);
 }

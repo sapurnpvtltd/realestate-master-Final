@@ -26,7 +26,7 @@ public class LeadServiceImpl implements LeadService{
     }
 
     @Override
-    public Lead searchLead(String leadId, String clientName) {
+    public Lead searchLead(Integer leadId, String clientName) {
         return leadRepository.findByLeadIdOrClientName(leadId, clientName);
     }
 
@@ -47,7 +47,7 @@ public class LeadServiceImpl implements LeadService{
     }
 
     @Override
-    public void deleteLead(String leadId) {
+    public void deleteLead(Integer leadId) {
         leadRepository.deleteById(leadId);
     }
 

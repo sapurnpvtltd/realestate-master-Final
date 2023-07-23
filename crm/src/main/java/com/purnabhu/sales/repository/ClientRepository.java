@@ -7,12 +7,12 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ClientRepository extends JpaRepository<Client,String> {
+public interface ClientRepository extends JpaRepository<Client,Integer> {
     Optional<Client> findByClientName(String clientName);
 
     Boolean existsByClientName(String clientName);
 
     Boolean existsByClientEmailId(String email);
 
-    Client findByClientIdOrClientName(String clientId, String clientName);
+    Client findByClientIdOrClientName(Integer clientId, String clientName);
 }

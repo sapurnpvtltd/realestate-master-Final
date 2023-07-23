@@ -8,12 +8,12 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface AgentRepository extends JpaRepository<Agent,String> {
+public interface AgentRepository extends JpaRepository<Agent,Integer> {
     Optional<Agent> findByAgentName(String agentName);
 
     Boolean existsByAgentName(String agentName);
 
     Boolean existsByAgentEmailId(String email);
 
-    Agent findByAgentIdOrAgentName(String agentId, String agentName);
+    Agent findByAgentIdOrAgentName(Integer agentId, String agentName);
 }

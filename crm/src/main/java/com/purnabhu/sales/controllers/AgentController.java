@@ -64,10 +64,10 @@ public class AgentController {
 
     @GetMapping(value = {"/searchAgent/{agentId}/{name}","/searchClient/{searchVal}"})
     private ResponseEntity<Agent> searchAgent(@PathVariable Map<String, String> agentSearch){
-        String agentId = agentSearch.get("clientId");
+        Integer agentId = Integer.valueOf(agentSearch.get("clientId"));
         String agentName = agentSearch.get("name");
         if(agentId==null && agentName == null) {
-            agentId = agentSearch.get("searchVal");
+            agentId = Integer.valueOf(agentSearch.get("searchVal"));
             agentName = agentSearch.get("searchVal");
         }
         logger.info("Search Agent by name and id....");
@@ -82,7 +82,7 @@ public class AgentController {
     }
 
     @PostMapping("/deleteAgent/{agentId}")
-    private ResponseEntityObject deleteAgent(@PathVariable String agentId){
+    private ResponseEntityObject deleteAgent(@PathVariable Integer agentId){
         logger.info("Delete Agent....");
         ResponseEntityObject responseEntityObject = new ResponseEntityObject();
         agentService.deleteAgent(agentId);

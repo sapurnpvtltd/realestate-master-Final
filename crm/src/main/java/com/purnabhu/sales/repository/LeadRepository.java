@@ -7,13 +7,13 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface LeadRepository extends JpaRepository<Lead,String> {
+public interface LeadRepository extends JpaRepository<Lead,Integer> {
     Optional<Lead> findByClientName(String clientName);
 
     Boolean existsByClientName(String clientName);
 
     Boolean existsByClientEmailId(String email);
 
-    Lead findByLeadIdOrClientName(String leadId, String clientName);
+    Lead findByLeadIdOrClientName(Integer leadId, String clientName);
 
 }
