@@ -1,8 +1,6 @@
 package com.purnabhu.sales.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -14,7 +12,7 @@ import lombok.*;
 @Table(name = "roles")
 public class Roles {
     @Id
-    private String roleId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long roleId;
     private String roleName;
-    private String roleDesc;
 }

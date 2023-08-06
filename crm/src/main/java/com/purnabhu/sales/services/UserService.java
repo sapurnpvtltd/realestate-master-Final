@@ -10,10 +10,10 @@ import java.util.Optional;
 public interface UserService {
     public User createUser(User user);
     public User updateUser(User user);
-    public User searchUser(String userId, String userName);
+    public Optional<User> searchUser(String userName);
     public List<User> getAllUser();
     public boolean existsByUsername(String username);
     public boolean existsByuserEmailId(String userEmailId);
 
-    public void deleteUser(String userId);
+    public void deleteUser(Long userId);
 }

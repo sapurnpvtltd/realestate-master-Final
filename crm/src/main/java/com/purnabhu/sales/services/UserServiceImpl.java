@@ -1,6 +1,5 @@
 package com.purnabhu.sales.services;
 
-import com.purnabhu.sales.entities.Roles;
 import com.purnabhu.sales.entities.User;
 import com.purnabhu.sales.repository.UserRepository;
 import org.apache.logging.log4j.LogManager;
@@ -22,13 +21,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public User createUser(User user) {
         logger.info("Creating user...");
-        Roles roles = new Roles();
-        roles.setRoleId(user.getUserId());
-        roles.setRoleName("ROLE_ADMIN");
-        roles.setRoleDesc("Admin");
-        HashSet roleSet = new HashSet();
-        roleSet.add(roles);
-        user.setRoles(roleSet);
         return userRepository.save(user);
     }
 
@@ -38,8 +30,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User searchUser(String userId, String userName) {
-        return userRepository.findByUserIdOrUserName(userId, userName);
+    public Optional<User> searchUser(String userName) {
+        return userRepository.findByUserName(userName);
     }
 
     @Override
@@ -68,7 +60,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public void deleteUser(String userId) {
+    public void deleteUser(Long userId) {
         userRepository.deleteById(userId);
     }
 }

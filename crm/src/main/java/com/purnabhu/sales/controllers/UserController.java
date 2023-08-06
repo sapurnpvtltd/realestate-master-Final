@@ -1,6 +1,8 @@
 package com.purnabhu.sales.controllers;
 
+import com.purnabhu.sales.entities.Roles;
 import com.purnabhu.sales.entities.User;
+import com.purnabhu.sales.repository.RoleRepository;
 import com.purnabhu.sales.response.ResponseEntityObject;
 import com.purnabhu.sales.services.UserService;
 import org.apache.logging.log4j.LogManager;
@@ -11,8 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -23,40 +24,45 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    @Autowired
+    RoleRepository roleRepository;
+
+    @Autowired
+    ResponseEntityObject responseEntityObject;
+
     @PostMapping("/addUser")
-    private ResponseEntityObject  createUser(@RequestBody User user){
-        ResponseEntityObject responseEntityObject = new ResponseEntityObject();
+    private ResponseEntity createUser(@RequestBody User user){
         if (userService.existsByUsername(user.getUserName())) {
-            responseEntityObject.setResponseMessage("Error: Username is already taken!");
-            return responseEntityObject;
+            //responseEntityObject.setResponseMessage("Error: Username is already taken!");
+            return responseEntityObject.generateResponse("Error: Username is already taken!",HttpStatus.NOT_ACCEPTABLE,"");
         }
 
         if (userService.existsByuserEmailId(user.getUserEmailId())) {
-            responseEntityObject.setResponseMessage("Error: Email is already in use!");
-            return responseEntityObject;
+            return responseEntityObject.generateResponse("Error: Email is already in use!",HttpStatus.NOT_ACCEPTABLE,"");
         }
 
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
+        Set<Roles> roles = new HashSet<>();
+
+        Roles userRole = roleRepository.findByRoleId(user.getRoles().iterator().next().getRoleId())
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+        roles.add(userRole);
+        user.setRoles(roles);
         logger.info("User creation start....");
         User createdUser = userService.createUser(user);
-        responseEntityObject.setResponseCode(200);
-        responseEntityObject.setResponseMessage("User created successfully");
-        return responseEntityObject;
+        return responseEntityObject.generateResponse("User created successfully",HttpStatus.OK,createdUser);
     }
 
     @PutMapping("/updateUser")
-    private ResponseEntityObject  updateUser(@RequestBody User user){
-        ResponseEntityObject responseEntityObject = new ResponseEntityObject();
+    private ResponseEntity  updateUser(@RequestBody User user){
         if (userService.existsByUsername(user.getUserName())) {
-            responseEntityObject.setResponseMessage("Error: Username is already taken!");
-            return responseEntityObject;
+            return responseEntityObject.generateResponse("Error: Username is already taken!",HttpStatus.NOT_ACCEPTABLE,"");
         }
 
         if (userService.existsByuserEmailId(user.getUserEmailId())) {
-            responseEntityObject.setResponseMessage("Error: Email is already in use!");
-            return responseEntityObject;
+            return responseEntityObject.generateResponse("Error: Email is already in use!",HttpStatus.NOT_ACCEPTABLE,"");
         }
 
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -64,9 +70,7 @@ public class UserController {
         user.setPassword(encodedPassword);
         logger.info("User updation start....");
         User createdUser = userService.updateUser(user);
-        responseEntityObject.setResponseCode(200);
-        responseEntityObject.setResponseMessage("User updated successfully");
-        return responseEntityObject;
+        return responseEntityObject.generateResponse("User updated successfully",HttpStatus.OK,createdUser);
     }
     @GetMapping("/resetPassword")
     private ResponseEntity<List<User>> resetPassword(){
@@ -74,33 +78,23 @@ public class UserController {
         List<User> usersList = userService.getAllUser();
         return new ResponseEntity<List<User>>(usersList,HttpStatus.OK);
     }
-
-    @GetMapping(value = {"/searchUser/{userId}/{name}", "/searchUser/{searchVal}"})
-    private ResponseEntity<User> searchUser(@PathVariable Map<String, String> userSearch){
-        String userId = userSearch.get("userId");
-        String userName = userSearch.get("name");
-        if(userId==null && userName == null) {
-            userId = userSearch.get("searchVal");
-            userName = userSearch.get("searchVal");
-        }
+    @GetMapping("/searchUser/{userName}")
+    private ResponseEntity<Object> searchUser(@PathVariable String userName){
         logger.info("Search User by name and id....");
-        User searchUser = userService.searchUser(userId, userName);
-        return new ResponseEntity<User>(searchUser,HttpStatus.OK);
+        Optional<User> searchUser = userService.searchUser(userName);
+        return responseEntityObject.generateResponse("User search successfully",HttpStatus.OK,searchUser);
     }
     @GetMapping("/getAllUsers")
-    private ResponseEntity<List<User>> getAllUsers(){
+    private ResponseEntity<Object> getAllUsers(){
         logger.info("Fetch All Users....");
         List<User> usersList = userService.getAllUser();
-        return new ResponseEntity<List<User>>(usersList,HttpStatus.OK);
+        return responseEntityObject.generateResponse("All Users",HttpStatus.OK,usersList);
     }
 
     @PostMapping("/deleteUser/{userId}")
-    private ResponseEntityObject deleteUser(@PathVariable String userId){
+    private ResponseEntity<Object> deleteUser(@PathVariable Long userId){
         logger.info("Delete User....");
-        ResponseEntityObject responseEntityObject = new ResponseEntityObject();
         userService.deleteUser(userId);
-        responseEntityObject.setResponseCode(200);
-        responseEntityObject.setResponseMessage("User deleted successfully");
-        return responseEntityObject;
+        return responseEntityObject.generateResponse("User deleted successfully",HttpStatus.OK,"");
     }
 }
