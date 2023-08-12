@@ -6,6 +6,7 @@ import com.purnabhu.sales.response.JwtResponse;
 import com.purnabhu.sales.response.ResponseEntityObject;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,11 +28,17 @@ public class LoginController {
 
     @Autowired
     JwtUtils jwtUtils;
+    @Value("${spring.security.username}")
+    private String username;
 
+    @Value("${spring.security.password}")
+    private String password;
     @PostMapping("/signin")
         public ResponseEntity<?> authenticateUser(@Valid @RequestBody JwtRequest jwtRequest) {
         this.doAuthenticate(jwtRequest.getUsername(), jwtRequest.getPassword());
-        UserDetails userDetails = userDetailsService.loadUserByUsername(jwtRequest.getUsername());
+        UserDetails userDetails = null;
+        if(jwtRequest.getUsername().equals(username))
+             userDetails = userDetailsService.loadUserByUsername(jwtRequest.getUsername());
         String token = this.jwtUtils.generateToken(userDetails);
         JwtResponse response = JwtResponse.builder()
                 .jwtToken(token)
