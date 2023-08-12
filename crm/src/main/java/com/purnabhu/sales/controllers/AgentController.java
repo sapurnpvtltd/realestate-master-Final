@@ -77,7 +77,7 @@ public class AgentController {
         Optional<Agent> searchAgent = null;
         try{
           searchAgent = agentService.searchAgent(agentName);
-          if(searchAgent == null)
+          if(searchAgent.isEmpty())
               return responseEntityObject.generateResponse("Agent Not Found",HttpStatus.OK,"");
         }catch (Exception exception){
             return responseEntityObject.generateResponse(exception.getMessage(),HttpStatus.NOT_ACCEPTABLE,"");
