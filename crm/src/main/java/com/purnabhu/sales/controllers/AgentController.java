@@ -2,9 +2,11 @@ package com.purnabhu.sales.controllers;
 
 import com.purnabhu.sales.entities.Agent;
 import com.purnabhu.sales.entities.Client;
+import com.purnabhu.sales.entities.User;
 import com.purnabhu.sales.response.ResponseEntityObject;
 import com.purnabhu.sales.services.AgentService;
 import com.purnabhu.sales.services.ClientService;
+import jakarta.validation.Valid;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -24,70 +27,85 @@ public class AgentController {
     @Autowired
     AgentService agentService;
 
+    @Autowired
+    ResponseEntityObject responseEntityObject;
+
     @PostMapping("/addAgent")
-    private ResponseEntityObject  createAgent(@RequestBody Agent agent){
+    private ResponseEntity  createAgent(@Valid @RequestBody Agent agent){
         ResponseEntityObject responseEntityObject = new ResponseEntityObject();
         if (agentService.existsByAgentName(agent.getAgentName())) {
-            responseEntityObject.setResponseMessage("Error: Agent is already taken!");
-            return responseEntityObject;
+            //responseEntityObject.setResponseMessage("Error: Agent is already taken!");
+            return responseEntityObject.generateResponse("Error: Agent is already exist!",HttpStatus.NOT_ACCEPTABLE,"");
         }
 
         if (agentService.existsByAgentEmailId(agent.getAgentEmailId())) {
-            responseEntityObject.setResponseMessage("Error: Email is already in use!");
-            return responseEntityObject;
+            //responseEntityObject.setResponseMessage("Error: Email is already in use!");
+            return responseEntityObject.generateResponse("Error: Email is already in use!",HttpStatus.NOT_ACCEPTABLE,"");
         }
         logger.info("Agent creation start....");
-        Agent createdAgent = agentService.createAgent(agent);
-        responseEntityObject.setResponseCode(200);
-        responseEntityObject.setResponseMessage("Agent created successfully");
-        return responseEntityObject;
+        Agent createdAgent = null;
+        try {
+            createdAgent = agentService.createAgent(agent);
+        }catch (Exception exception){
+            return responseEntityObject.generateResponse(exception.getMessage(),HttpStatus.NOT_ACCEPTABLE,"");
+        }
+        return responseEntityObject.generateResponse("Agent created successfully",HttpStatus.OK,createdAgent);
     }
 
     @PutMapping("/updateAgent")
-    private ResponseEntityObject  updateAgent(@RequestBody Agent agent){
-        ResponseEntityObject responseEntityObject = new ResponseEntityObject();
+    private ResponseEntity  updateAgent(@Valid @RequestBody Agent agent) {
         if (agentService.existsByAgentName(agent.getAgentName())) {
-            responseEntityObject.setResponseMessage("Error: Agent Name is already taken!");
-            return responseEntityObject;
+            return responseEntityObject.generateResponse("Error: Agent Name is already exist!", HttpStatus.NOT_ACCEPTABLE, "");
         }
 
         if (agentService.existsByAgentEmailId(agent.getAgentEmailId())) {
-            responseEntityObject.setResponseMessage("Error: Email is already in use!");
-            return responseEntityObject;
+            return responseEntityObject.generateResponse("Error: Email is already in use!", HttpStatus.NOT_ACCEPTABLE, "");
         }
         logger.info("Agent updation start....");
-        Agent createdAgent = agentService.updateAgent(agent);
-        responseEntityObject.setResponseCode(200);
-        responseEntityObject.setResponseMessage("Agent updated successfully");
-        return responseEntityObject;
+        Agent createdAgent = null;
+        try{
+            createdAgent = agentService.updateAgent(agent);
+        }catch (Exception exception){
+            return responseEntityObject.generateResponse(exception.getMessage(),HttpStatus.NOT_ACCEPTABLE,"");
+        }
+        return responseEntityObject.generateResponse("Agent updated successfully",HttpStatus.OK,createdAgent);
     }
 
-    @GetMapping(value = {"/searchAgent/{agentId}/{name}","/searchClient/{searchVal}"})
-    private ResponseEntity<Agent> searchAgent(@PathVariable Map<String, String> agentSearch){
-        Integer agentId = Integer.valueOf(agentSearch.get("clientId"));
-        String agentName = agentSearch.get("name");
-        if(agentId==null && agentName == null) {
-            agentId = Integer.valueOf(agentSearch.get("searchVal"));
-            agentName = agentSearch.get("searchVal");
-        }
+    @GetMapping("/searchAgent/{agentName}")
+    private ResponseEntity<Object> searchAgent(@PathVariable String agentName){
         logger.info("Search Agent by name and id....");
-        Agent searchAgent = agentService.searchAgent(agentId, agentName);
-        return new ResponseEntity<Agent>(searchAgent,HttpStatus.OK);
+        Optional<Agent> searchAgent = null;
+        try{
+          searchAgent = agentService.searchAgent(agentName);
+          if(searchAgent == null)
+              return responseEntityObject.generateResponse("Agent Not Found",HttpStatus.OK,"");
+        }catch (Exception exception){
+            return responseEntityObject.generateResponse(exception.getMessage(),HttpStatus.NOT_ACCEPTABLE,"");
+        }
+        return responseEntityObject.generateResponse("Agent Searched successfully",HttpStatus.OK,searchAgent);
     }
     @GetMapping("/getAllAgents")
-    private ResponseEntity<List<Agent>> getAllAgents(){
+    private ResponseEntity<Object> getAllAgents(){
         logger.info("Fetch All Agents....");
-        List<Agent> agentList = agentService.getAllAgent();
-        return new ResponseEntity<List<Agent>>(agentList,HttpStatus.OK);
+        List<Agent> agentList = null;
+        try {
+            agentList = agentService.getAllAgent();
+            if(agentList.isEmpty())
+                return responseEntityObject.generateResponse("Agents Not Available",HttpStatus.OK,"");
+        }catch (Exception exception){
+            return responseEntityObject.generateResponse(exception.getMessage(),HttpStatus.NOT_ACCEPTABLE,"");
+        }
+        return responseEntityObject.generateResponse("All Agents",HttpStatus.OK,agentList);
     }
 
     @PostMapping("/deleteAgent/{agentId}")
-    private ResponseEntityObject deleteAgent(@PathVariable Integer agentId){
+    private ResponseEntity<Object> deleteAgent(@PathVariable Integer agentId){
         logger.info("Delete Agent....");
-        ResponseEntityObject responseEntityObject = new ResponseEntityObject();
-        agentService.deleteAgent(agentId);
-        responseEntityObject.setResponseCode(200);
-        responseEntityObject.setResponseMessage("Agent deleted successfully");
-        return responseEntityObject;
+        try {
+            agentService.deleteAgent(agentId);
+        }catch (Exception exception){
+            return responseEntityObject.generateResponse(exception.getMessage(),HttpStatus.NOT_ACCEPTABLE,"");
+        }
+        return responseEntityObject.generateResponse("Agent deleted successfully",HttpStatus.OK,"");
     }
 }

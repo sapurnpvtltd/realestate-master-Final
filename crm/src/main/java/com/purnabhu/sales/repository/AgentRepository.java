@@ -14,6 +14,4 @@ public interface AgentRepository extends JpaRepository<Agent,Integer> {
     Boolean existsByAgentName(String agentName);
 
     Boolean existsByAgentEmailId(String email);
-
-    Agent findByAgentIdOrAgentName(Integer agentId, String agentName);
 }

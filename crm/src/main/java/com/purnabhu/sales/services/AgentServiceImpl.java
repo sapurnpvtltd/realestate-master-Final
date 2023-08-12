@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AgentServiceImpl implements AgentService{
@@ -26,8 +27,8 @@ public class AgentServiceImpl implements AgentService{
     }
 
     @Override
-    public Agent searchAgent(Integer agentId, String agentName) {
-        return agentRepository.findByAgentIdOrAgentName(agentId, agentName);
+    public Optional<Agent> searchAgent(String agentName) {
+        return agentRepository.findByAgentName(agentName);
     }
 
     @Override

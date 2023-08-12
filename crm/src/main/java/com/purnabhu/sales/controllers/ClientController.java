@@ -1,8 +1,10 @@
 package com.purnabhu.sales.controllers;
 
+import com.purnabhu.sales.entities.Agent;
 import com.purnabhu.sales.entities.Client;
 import com.purnabhu.sales.response.ResponseEntityObject;
 import com.purnabhu.sales.services.ClientService;
+import jakarta.validation.Valid;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -22,71 +25,83 @@ public class ClientController {
     @Autowired
     ClientService clientService;
 
+    @Autowired
+    ResponseEntityObject responseEntityObject;
+
     @PostMapping("/addClient")
-    private ResponseEntityObject  createClient(@RequestBody Client client){
-        ResponseEntityObject responseEntityObject = new ResponseEntityObject();
+    private ResponseEntity<Object>  createClient(@Valid @RequestBody Client client){
         if (clientService.existsByClientName(client.getClientName())) {
-            responseEntityObject.setResponseMessage("Error: Client is already taken!");
-            return responseEntityObject;
+            return responseEntityObject.generateResponse("Error: Client is already exist!",HttpStatus.NOT_ACCEPTABLE,"");
         }
 
         if (clientService.existsByClientEmailId(client.getClientEmailId())) {
-            responseEntityObject.setResponseMessage("Error: Email is already in use!");
-            return responseEntityObject;
+            return responseEntityObject.generateResponse("Error: Email is already in use!",HttpStatus.NOT_ACCEPTABLE,"");
         }
         logger.info("Client creation start....");
-        Client createdClient = clientService.createClient(client);
-        responseEntityObject.setResponseCode(200);
-        responseEntityObject.setResponseMessage("Client created successfully");
-        return responseEntityObject;
+        Client createdClient = null;
+        try {
+            createdClient = clientService.createClient(client);
+        }catch (Exception exception){
+            return responseEntityObject.generateResponse(exception.getMessage(),HttpStatus.NOT_ACCEPTABLE,"");
+        }
+        return responseEntityObject.generateResponse("Client created successfully",HttpStatus.OK,createdClient);
     }
 
     @PutMapping("/updateClient")
-    private ResponseEntityObject  updateClient(@RequestBody Client client){
+    private ResponseEntity<Object>  updateClient(@Valid @RequestBody Client client){
         ResponseEntityObject responseEntityObject = new ResponseEntityObject();
         if (clientService.existsByClientName(client.getClientName())) {
-            responseEntityObject.setResponseMessage("Error: Clinet Name is already taken!");
-            return responseEntityObject;
+            return responseEntityObject.generateResponse("Error: Clinet Name is already exist!", HttpStatus.NOT_ACCEPTABLE, "");
         }
 
         if (clientService.existsByClientEmailId(client.getClientEmailId())) {
-            responseEntityObject.setResponseMessage("Error: Email is already in use!");
-            return responseEntityObject;
+            return responseEntityObject.generateResponse("Error: Email is already in use!", HttpStatus.NOT_ACCEPTABLE, "");
         }
         logger.info("Client updation start....");
-        Client createdClient = clientService.updateClient(client);
-        responseEntityObject.setResponseCode(200);
-        responseEntityObject.setResponseMessage("User updated successfully");
-        return responseEntityObject;
+        Client createdClient = null;
+        try{
+            createdClient = clientService.updateClient(client);
+        }catch (Exception exception){
+            return responseEntityObject.generateResponse(exception.getMessage(),HttpStatus.NOT_ACCEPTABLE,"");
+        }
+        return responseEntityObject.generateResponse("User updated successfully",HttpStatus.OK,createdClient);
     }
 
-    @GetMapping(value = {"/searchClient/{clientId}/{name}", "/searchClient/{searchVal}"})
-    private ResponseEntity<Client> searchClient(@PathVariable Map<String, String> clientSearch){
-        Integer clientId = Integer.valueOf(clientSearch.get("clientId"));
-        String clientName = clientSearch.get("name");
-        if(clientId==null && clientName == null) {
-            clientId = Integer.valueOf(clientSearch.get("searchVal"));
-            clientName = clientSearch.get("searchVal");
+    @GetMapping("/searchClient/{clientName}")
+    private ResponseEntity<Object> searchClient(@PathVariable String clientName){
+         logger.info("Search Clinet by name and id....");
+        Optional<Client> searchClient = null;
+        try{
+            searchClient = clientService.searchClient(clientName);
+            if(searchClient.isEmpty())
+                return responseEntityObject.generateResponse("Client Not Found",HttpStatus.OK,"");
+        }catch (Exception exception){
+            return responseEntityObject.generateResponse(exception.getMessage(),HttpStatus.NOT_ACCEPTABLE,"");
         }
-        logger.info("Search Clinet by name and id....");
-        Client searchClient = clientService.searchClient(clientId, clientName);
-        return new ResponseEntity<Client>(searchClient,HttpStatus.OK);
+        return responseEntityObject.generateResponse("Clients Search successfully",HttpStatus.OK,searchClient);
     }
     @GetMapping("/getAllClients")
-    private ResponseEntity<List<Client>> getAllClients(){
+    private ResponseEntity<Object> getAllClients(){
         logger.info("Fetch All Clients....");
-        List<Client> clientList = clientService.getAllClient();
-        return new ResponseEntity<List<Client>>(clientList,HttpStatus.OK);
+        List<Client> clientList = null;
+        try {
+            clientList = clientService.getAllClient();
+            if(clientList.isEmpty())
+                return responseEntityObject.generateResponse("Clients Not Available",HttpStatus.OK,"");
+        }catch (Exception exception){
+            return responseEntityObject.generateResponse(exception.getMessage(),HttpStatus.NOT_ACCEPTABLE,"");
+        }
+        return responseEntityObject.generateResponse("All Clients",HttpStatus.OK,clientList);
     }
 
     @PostMapping("/deleteClient/{clientId}")
-    private ResponseEntityObject deleteClient(@PathVariable Integer clientId){
+    private ResponseEntity<Object> deleteClient(@PathVariable Integer clientId){
         logger.info("Delete client....");
-        ResponseEntityObject responseEntityObject = new ResponseEntityObject();
-        clientService.deleteClient(clientId);
-        responseEntityObject.setResponseCode(200);
-        responseEntityObject.setResponseMessage("Client deleted successfully");
-        return responseEntityObject;
+        try{
+            clientService.deleteClient(clientId);
+        }catch (Exception exception){
+            return responseEntityObject.generateResponse(exception.getMessage(),HttpStatus.NOT_ACCEPTABLE,"");
+        }
+        return responseEntityObject.generateResponse("Client deleted successfully",HttpStatus.OK,"");
     }
-
 }
