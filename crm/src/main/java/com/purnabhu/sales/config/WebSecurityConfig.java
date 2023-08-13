@@ -42,6 +42,7 @@ public class WebSecurityConfig {
                 .authorizeRequests().
                 requestMatchers("/loginauth/**").permitAll()
                 //.requestMatchers("/**").permitAll()
+               // .requestMatchers("/swagger-ui/**").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and().exceptionHandling(ex -> ex.authenticationEntryPoint(point))

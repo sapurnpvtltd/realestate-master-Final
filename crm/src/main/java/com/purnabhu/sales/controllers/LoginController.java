@@ -35,9 +35,9 @@ public class LoginController {
     private String password;
     @PostMapping("/signin")
         public ResponseEntity<?> authenticateUser(@Valid @RequestBody JwtRequest jwtRequest) {
-        this.doAuthenticate(jwtRequest.getUsername(), jwtRequest.getPassword());
+        //this.doAuthenticate(jwtRequest.getUsername(), jwtRequest.getPassword());
         UserDetails userDetails = null;
-        if(jwtRequest.getUsername().equals(username))
+        //if(jwtRequest.getUsername().equals(username))
              userDetails = userDetailsService.loadUserByUsername(jwtRequest.getUsername());
         String token = this.jwtUtils.generateToken(userDetails);
         JwtResponse response = JwtResponse.builder()
