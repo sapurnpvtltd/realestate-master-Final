@@ -1,7 +1,10 @@
 package com.purnabhu.sales.response;
 
 import lombok.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -14,4 +17,12 @@ public class ResponseEntityObject {
     private String responseMessage;
     private Map<String,Object> dataMap;
 
+    public static ResponseEntity<Object> generateResponse(String message, HttpStatus status, Object responseObj) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("message", message);
+        map.put("status", status.value());
+        map.put("data", responseObj);
+
+        return new ResponseEntity<Object>(map,status);
+    }
 }
