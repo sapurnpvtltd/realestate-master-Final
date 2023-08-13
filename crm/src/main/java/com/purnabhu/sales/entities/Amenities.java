@@ -13,7 +13,7 @@ import lombok.Setter;
 public class Amenities {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    int id;
+    int amenityid;
     @Column(name = "amenityname")
     String amenityname;
 }
