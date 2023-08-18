@@ -17,9 +17,12 @@ public class CrmApplication {
 	public WebMvcConfigurer corsMappingConfigurer() {
 		return new WebMvcConfigurer() {
 			@Override
-			public void addCorsMappings(CorsRegistry registry) {
+			/*public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/**").allowedMethods("GET","POST","PUT","DELETE").
 						allowedOrigins("http://localhost:3000").allowedHeaders("*");
+			}*/
+			public void addCorsMappings(CorsRegistry registry) {
+				registry.addMapping("/**").allowedOrigins("*");						
 			}
 		};
 	}
