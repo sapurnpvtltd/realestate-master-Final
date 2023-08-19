@@ -19,6 +19,14 @@ AmenitiesRepository amenitiesrepo;
 SourceRepository sourcerepo;
 
 
+ public List<Amenities> getAmenityByIds(List<Integer> ids){
+
+
+     return amenitiesrepo.findAllById(ids);
+
+ }
+
+
 public List<Amenities> getAmenities(){
 
 
